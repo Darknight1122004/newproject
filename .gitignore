@@ -1,196 +1,52 @@
-#include <curses.h>
-#include <stdlib.h>
-#include <time.h>
+# Prerequisites
+*.d
 
-typedef struct Node {
-    int x, y;
-    struct Node* next;
-} Node;
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
 
-enum Direction {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
-};
+# Linker output
+*.ilk
+*.map
+*.exp
 
-// Function declarations
-void setup();
-void draw();
-void input();
-void logic();
-void cleanup();
+# Precompiled Headers
+*.gch
+*.pch
 
-// Global variables
-Node* snake;
-int width, height;
-int foodX, foodY;
-int len;
-enum Direction dir;
-bool gameover;
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
 
-int main() {
-    setup();
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
 
-    while (!gameover) {
-        draw();
-        input();
-        logic();
-    }
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
 
-    cleanup();
-    return 0;
-}
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
 
-void setup() {
-    setlocale(LC_ALL, "");
-    initscr();
-    cbreak();
-    noecho();
-    nonl();
-    intrflush(stdscr, FALSE);
-    keypad(stdscr, TRUE);
-    timeout(0);
-    curs_set(0);
-
-    getmaxyx(stdscr, height, width);
-    width = (width + 1) / 2;
-
-    snake = (Node*)malloc(sizeof(Node));
-    snake->x = width / 2;
-    snake->y = height / 2;
-    snake->next = NULL;
-
-    len = 1;
-    dir = RIGHT;
-    gameover = false;
-
-    srand(time(0));
-    generateFood();
-}
-
-void draw() {
-    clear();
-
-    // Draw snake
-    Node* current = snake;
-    for (int i = 0; i < len; i++) {
-        mvprintw(current->y, current->x * 2, "O");
-        current = current->next;
-    }
-
-    // Draw food
-    mvprintw(foodY, foodX * 2, "F");
-
-    refresh();
-}
-
-void input() {
-    int key = getch();
-
-    switch (key) {
-        case KEY_UP:
-            dir = UP;
-            break;
-        case KEY_DOWN:
-            dir = DOWN;
-            break;
-        case KEY_LEFT:
-            dir = LEFT;
-            break;
-        case KEY_RIGHT:
-            dir = RIGHT;
-            break;
-        case 27: // ASCII code for escape key
-            gameover = true;
-            break;
-    }
-}
-
-void logic() {
-    // Move the snake
-    int newX = snake->x;
-    int newY = snake->y;
-
-    switch (dir) {
-        case UP:
-            newY--;
-            break;
-        case DOWN:
-            newY++;
-            break;
-        case LEFT:
-            newX--;
-            break;
-        case RIGHT:
-            newX++;
-            break;
-    }
-
-    // Check collision with walls or self
-    if (newX < 0 || newX >= width || newY < 0 || newY >= height) {
-        gameover = true;
-        return;
-    }
-
-    // Check collision with food
-    if (newX == foodX && newY == foodY) {
-        len++;
-        generateFood();
-    }
-
-    // Move the snake
-    Node* newHead = (Node*)malloc(sizeof(Node));
-    newHead->x = newX;
-    newHead->y = newY;
-    newHead->next = snake;
-    snake = newHead;
-
-    // Check collision with self after moving
-    current = snake->next;
-    while (current != NULL) {
-        if (newX == current->x && newY == current->y) {
-            gameover = true;
-            break;
-        }
-        current = current->next;
-    }
-
-    // Remove the tail if the length exceeds
-    if (len > 1) {
-        current = snake;
-        for (int i = 0; i < len - 1; i++) {
-            current = current->next;
-        }
-        free(current->next);
-        current->next = NULL;
-    }
-}
-
-void generateFood() {
-    do {
-        foodX = rand() % width;
-        foodY = rand() % height;
-    } while (collisionWithSnake(foodX, foodY));
-}
-
-bool collisionWithSnake(int x, int y) {
-    Node* current = snake;
-    while (current != NULL) {
-        if (x == current->x && y == current->y) {
-            return true;
-        }
-        current = current->next;
-    }
-    return false;
-}
-
-void cleanup() {
-    endwin();
-    Node* current = snake;
-    while (current != NULL) {
-        Node* temp = current;
-        current = current->next;
-        free(temp);
-    }
-}
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
